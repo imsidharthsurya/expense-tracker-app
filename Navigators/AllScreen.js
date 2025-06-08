@@ -9,8 +9,8 @@ const AllScreen = () => {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: "#b6d3f0",
-        tabBarInactiveTintColor: "white",
+        tabBarActiveTintColor: "white",
+        tabBarInactiveTintColor: "#b6d3f0",
         headerStyle: {
           backgroundColor: "#1d538a",
         },

@@ -2,23 +2,48 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   Pressable,
+  Alert,
 } from "react-native";
 import { useState } from "react";
 import Toast from "../Components/Toast";
+import { useDispatch } from "react-redux";
+import { addExpense } from "../store/expenseSlice";
+
+const generateId = () =>
+  Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
 const AddExpense = () => {
   const [allData, setAllData] = useState({
+    id: "",
     name: "",
     date: "",
     amount: "",
   });
+  const dispatch = useDispatch();
   const [showToast, setShowToast] = useState(false);
   const handleAddGoal = () => {
-    console.log("goal to add is: ", allData);
+    if (
+      allData.name.trim() === "" ||
+      allData.date.trim() === "" ||
+      allData.amount.trim() === ""
+    ) {
+      Alert.alert("Invalid Data", "Input field cannot be empty", [
+        {
+          text: "Okay",
+        },
+      ]);
+      return;
+    }
+    // add the expense to redux store
+    const expenseObj = {
+      ...allData,
+      id: generateId(),
+    };
+    dispatch(addExpense(expenseObj));
     setAllData({
+      id: "",
       name: "",
       date: "",
       amount: "",
@@ -60,7 +85,7 @@ const AddExpense = () => {
           style={styles.txtInput}
         />
         <Pressable style={styles.btn} onPress={handleAddGoal}>
-          <Text style={styles.btnText}>Add Goal</Text>
+          <Text style={styles.btnText}>Add Expense</Text>
         </Pressable>
       </View>
       {showToast && <Toast handleToastClose={handleToastClose} />}
@@ -86,11 +111,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginVertical: 20,
     width: "70%",
-    textAlign: "center",
   },
   inputContainer: {
     width: "100%",
     alignItems: "center",
+    padding: 80,
   },
   btn: {
     paddingVertical: 16,
