@@ -26,10 +26,12 @@ export default RecentExpenses;
 
 const styles = StyleSheet.create({
   mainContainer: {
+    flex: 1,
     alignItems: "center",
   },
   expenseList: {
     width: "80%",
-    marginBottom: 220,
+    marginBottom: 20,
+    flex: 1,
   },
 });

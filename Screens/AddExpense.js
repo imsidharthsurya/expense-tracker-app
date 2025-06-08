@@ -10,11 +10,23 @@ import { useState } from "react";
 import Toast from "../Components/Toast";
 import { useDispatch } from "react-redux";
 import { addExpense } from "../store/expenseSlice";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const generateId = () =>
   Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
 const AddExpense = () => {
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
+
+  const onChange = (event, selectedDate) => {
+    setShowPicker(false);
+    if (event.type === "set" && selectedDate) {
+      setDate(selectedDate);
+      handleChange(selectedDate.toISOString().split("T")[0], "date");
+    }
+  };
+
   const [allData, setAllData] = useState({
     id: "",
     name: "",
@@ -78,12 +90,18 @@ const AddExpense = () => {
           value={allData.amount}
           style={styles.txtInput}
         />
-        <TextInput
-          placeholder="date"
-          onChangeText={(text) => handleChange(text, "date")}
-          value={allData.date}
-          style={styles.txtInput}
-        />
+        <Pressable style={styles.calendar} onPress={() => setShowPicker(true)}>
+          <Text>{allData.date || "Select Date"}</Text>
+          {showPicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={onChange}
+            />
+          )}
+        </Pressable>
+
         <Pressable style={styles.btn} onPress={handleAddGoal}>
           <Text style={styles.btnText}>Add Expense</Text>
         </Pressable>
@@ -130,5 +148,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: "white",
     fontWeight: "bold",
+  },
+  calendar: {
+    borderWidth: 1,
+    marginVertical: 20,
+    width: "70%",
+    padding: 10,
   },
 });
