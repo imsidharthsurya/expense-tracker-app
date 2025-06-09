@@ -1,11 +1,13 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 
-const Toast = ({ handleToastClose }) => {
+const Toast = ({ handleToastClose, isEdit }) => {
   return (
     <View style={styles.toastOuter}>
       <View style={styles.toastcont}>
-        <Text style={styles.toastText}>Goal Added Successfully!</Text>
+        <Text style={styles.toastText}>
+          {isEdit ? "Goal Edited Successfully!" : "Goal Added Successfully!"}
+        </Text>
         <Pressable onPress={handleToastClose}>
           <Entypo name="cross" size={34} color="white" />
         </Pressable>
@@ -36,7 +38,7 @@ const styles = StyleSheet.create({
   },
   toastText: {
     color: "white",
-    fontWeight: "bold",
-    fontSize: 20,
+    fontWeight: "semibold",
+    fontSize: 18,
   },
 });

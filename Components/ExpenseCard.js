@@ -1,16 +1,38 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable, Modal } from "react-native";
+import { useState } from "react";
+import EditExpense from "./EditExpense";
 
 const ExpenseCard = ({ id, name, date, amount }) => {
+  const [showEdit, setShowEdit] = useState(false);
+  const handleExpensePress = (id) => {
+    console.log("expense clicked: ", id);
+    setShowEdit(true);
+  };
   return (
-    <View style={styles.card}>
-      <View style={styles.cardNameContainer}>
-        <Text style={styles.expenseText}>{name}</Text>
-        <Text style={styles.expenseText}>{date}</Text>
-      </View>
-      <View style={styles.cardAmountContainer}>
-        <Text style={styles.expenseText}>{amount}</Text>
-      </View>
-    </View>
+    <>
+      <Pressable
+        style={styles.card}
+        android_ripple={{ color: "#2a79c9" }}
+        onPress={() => handleExpensePress(id)}
+      >
+        <View style={styles.cardNameContainer}>
+          <Text
+            style={styles.expenseText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {name.length > 13 ? name.substring(0, 13) + "..." : name}
+          </Text>
+          <Text style={styles.expenseDate}>{date}</Text>
+        </View>
+        <View style={styles.cardAmountContainer}>
+          <Text style={styles.expenseText}>{amount}</Text>
+        </View>
+      </Pressable>
+      <Modal visible={showEdit}>
+        <EditExpense id={id} name={name} setShowEdit={setShowEdit} />
+      </Modal>
+    </>
   );
 };
 
@@ -29,14 +51,19 @@ const styles = StyleSheet.create({
   expenseText: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: 18,
+  },
+  expenseDate: {
+    color: "white",
+    fontSize: 15,
   },
   cardNameContainer: {
     gap: 10,
   },
   cardAmountContainer: {
     backgroundColor: "#2a79c9",
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 8,
     elevation: 5,
   },

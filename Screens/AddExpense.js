@@ -6,18 +6,22 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Toast from "../Components/Toast";
-import { useDispatch } from "react-redux";
-import { addExpense } from "../store/expenseSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addExpense, editExpense } from "../store/expenseSlice";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const generateId = () =>
   Date.now().toString() + Math.random().toString(36).substr(2, 9);
 
-const AddExpense = () => {
+const AddExpense = ({ route, navigation }) => {
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
+  const allExpense = useSelector((store) => store.expense.expenses);
+
+  const isEdit = route?.params?.isEdit;
+  const expenseId = route?.params?.expenseId;
 
   const onChange = (event, selectedDate) => {
     setShowPicker(false);
@@ -27,6 +31,17 @@ const AddExpense = () => {
     }
   };
 
+  useEffect(() => {
+    if (isEdit) {
+      navigation.setOptions({
+        title: "Edit Expense",
+      });
+      const expense = allExpense.filter((expense) => {
+        return expense.id === expenseId;
+      });
+      setAllData(expense[0]);
+    }
+  }, [isEdit, expenseId]);
   const [allData, setAllData] = useState({
     id: "",
     name: "",
@@ -48,18 +63,26 @@ const AddExpense = () => {
       ]);
       return;
     }
-    // add the expense to redux store
-    const expenseObj = {
-      ...allData,
-      id: generateId(),
-    };
-    dispatch(addExpense(expenseObj));
-    setAllData({
-      id: "",
-      name: "",
-      date: "",
-      amount: "",
-    });
+    if (isEdit) {
+      //edit the expense
+      console.log("in edit data is: ", allData);
+      dispatch(editExpense(allData));
+    } else {
+      // add the expense to redux store
+      const expenseObj = {
+        ...allData,
+        id: generateId(),
+      };
+      dispatch(addExpense(expenseObj));
+      // clear data only case of add expense
+      setAllData({
+        id: "",
+        name: "",
+        date: "",
+        amount: "",
+      });
+    }
+
     setShowToast(true);
     setTimeout(() => {
       setShowToast(false);
@@ -76,7 +99,6 @@ const AddExpense = () => {
   };
   return (
     <View style={styles.mainCont}>
-      <Text style={styles.title}>Add Expense</Text>
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="expense name"
@@ -103,10 +125,14 @@ const AddExpense = () => {
         </Pressable>
 
         <Pressable style={styles.btn} onPress={handleAddGoal}>
-          <Text style={styles.btnText}>Add Expense</Text>
+          <Text style={styles.btnText}>
+            {isEdit ? "Edit Expense" : "Add Expense"}
+          </Text>
         </Pressable>
       </View>
-      {showToast && <Toast handleToastClose={handleToastClose} />}
+      {showToast && (
+        <Toast handleToastClose={handleToastClose} isEdit={isEdit} />
+      )}
     </View>
   );
 };
@@ -137,7 +163,7 @@ const styles = StyleSheet.create({
   },
   btn: {
     paddingVertical: 16,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     backgroundColor: "#2a79c9",
     alignItems: "stretch",
     marginTop: 10,
@@ -145,7 +171,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   btnText: {
-    fontSize: 22,
+    fontSize: 18,
     color: "white",
     fontWeight: "bold",
   },
